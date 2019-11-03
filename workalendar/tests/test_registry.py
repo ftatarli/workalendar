@@ -1,4 +1,3 @@
-from datetime import date
 from unittest import TestCase
 
 from workalendar.registry import IsoRegistry
@@ -8,27 +7,13 @@ from workalendar.core import Calendar
 class RegionCalendar(Calendar):
     'Region'
 
-    def holidays(self, year=None):
-        return tuple((
-            (date(year, 12, 25), 'Christmas'),
-            (date(year, 1, 1), 'New year'),
-        ))
-
-    def get_weekend_days(self):
-        return []  # no week-end, yes, it's sad
-
 
 class SubRegionCalendar(Calendar):
     'Sub Region'
 
-    def holidays(self, year=None):
-        return tuple((
-            (date(year, 12, 25), 'Christmas'),
-            (date(year, 1, 1), 'New year'),
-        ))
 
-    def get_weekend_days(self):
-        return []  # no week-end, yes, it's sad
+class NotACalendarClass(object):
+    "Not a Calendar"
 
 
 class MockCalendarTest(TestCase):
@@ -71,3 +56,8 @@ class MockCalendarTest(TestCase):
         items = registry.items(['RE'], include_subregions=False)
         self.assertEqual(1, len(items))
         self.assertIn('RE', items)
+
+    def test_register_non_calendar(self):
+        registry = IsoRegistry(load_standard_modules=False)
+        with self.assertRaises(Exception):
+            registry.register("NAC", NotACalendarClass)
